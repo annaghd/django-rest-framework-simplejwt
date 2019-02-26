@@ -43,7 +43,7 @@ class OutstandingTokenAdmin(admin.ModelAdmin):
         )
 
 
-admin.site.register(OutstandingToken, OutstandingTokenAdmin)
+#admin.site.register(OutstandingToken, OutstandingTokenAdmin)
 
 
 class BlacklistedTokenAdmin(admin.ModelAdmin):
@@ -87,5 +87,4 @@ class BlacklistedTokenAdmin(admin.ModelAdmin):
     token_expires_at.short_description = _('expires at')
     token_expires_at.admin_order_field = 'token__expires_at'
 
-
-admin.site.register(BlacklistedToken, BlacklistedTokenAdmin)
+#admin.site.register(BlacklistedToken, BlacklistedTokenAdmin)
