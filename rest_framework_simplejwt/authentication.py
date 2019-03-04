@@ -5,6 +5,8 @@ from rest_framework import HTTP_HEADER_ENCODING, authentication
 from .exceptions import AuthenticationFailed, InvalidToken, TokenError
 from .settings import api_settings
 
+from django.core.cache import cache
+
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
 
 if not isinstance(api_settings.AUTH_HEADER_TYPES, (list, tuple)):
@@ -115,8 +117,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         except self.user_model.DoesNotExist:
             raise AuthenticationFailed(_('User not found'), code='user_not_found')
 
-        if not user.is_active:
-            raise AuthenticationFailed(_('User is inactive'), code='user_inactive')
+        if cache.get(validated_token[api_settings.TOKEN_TYPE_CLAIM] + '_' + validated_token['jti']) == 1:
+            raise InvalidToken(_('Token blacklisted'))
 
         return user
 

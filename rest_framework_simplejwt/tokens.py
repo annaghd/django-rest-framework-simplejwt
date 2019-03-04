@@ -11,6 +11,7 @@ from .utils import (
     aware_utcnow, datetime_from_epoch, datetime_to_epoch, format_lazy,
 )
 
+from django.core.cache import cache
 
 class Token:
     """
@@ -54,6 +55,8 @@ class Token:
 
             # Set "jti" claim
             self.set_jti()
+
+            cache.set(self.token_type + '_' + self.payload['jti'], 0, timeout=self.lifetime.total_seconds())
 
     def __repr__(self):
         return repr(self.payload)
