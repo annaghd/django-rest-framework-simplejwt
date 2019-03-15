@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import HTTP_HEADER_ENCODING, authentication
-
+from django.utils import timezone
 from .exceptions import AuthenticationFailed, InvalidToken, TokenError
 from .settings import api_settings
 
@@ -116,6 +116,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
             user = self.user_model.objects.get(**{api_settings.USER_ID_FIELD: user_id})
         except self.user_model.DoesNotExist:
             raise AuthenticationFailed(_('User not found'), code='user_not_found')
+
+        is_blocked_time_not_expired = user.blocked_until > timezone.localdate() if user.blocked_until else True
+
+        if user.blocked is True and is_blocked_time_not_expired:
+            raise AuthenticationFailed(_('BLOCKED'), code='user_blocked')
 
         if cache.get(validated_token[api_settings.TOKEN_TYPE_CLAIM] + '_' + validated_token['jti']) == 1:
             raise InvalidToken(_('Token blacklisted'))
