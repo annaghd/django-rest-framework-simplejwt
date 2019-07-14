@@ -4,6 +4,7 @@ from rest_framework import HTTP_HEADER_ENCODING, authentication
 from django.utils import timezone
 from .exceptions import AuthenticationFailed, InvalidToken, TokenError
 from .settings import api_settings
+from django_global_request.middleware import get_request
 
 from django.core.cache import cache
 
@@ -92,7 +93,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
         messages = []
         for AuthToken in api_settings.AUTH_TOKEN_CLASSES:
             try:
-                return AuthToken(raw_token)
+                token = AuthToken(raw_token)
+                get_request().session['token_type'] = AuthToken.token_type
+                if AuthToken.token_type == 'refresh':
+                    get_request().session['access_token'] = str(token.access_token)
+                return token
             except TokenError as e:
                 messages.append({'token_class': AuthToken.__name__,
                                  'token_type': AuthToken.token_type,
