@@ -97,6 +97,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
                 get_request().session['token_type'] = AuthToken.token_type
                 if AuthToken.token_type == 'refresh':
                     get_request().session['access_token'] = str(token.access_token)
+                    get_request().session['refresh_token'] = str(token)
                 return token
             except TokenError as e:
                 messages.append({'token_class': AuthToken.__name__,
@@ -104,7 +105,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
                                  'message': e.args[0]})
 
         raise InvalidToken({
-            'detail': _('Given token not valid for any token type'),
+            'detail': 'INVALID_TOKEN',
             'messages': messages,
         })
 
