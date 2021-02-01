@@ -7,6 +7,7 @@ from .settings import api_settings
 from django_middleware_global_request.middleware import get_request
 
 from django.core.cache import cache
+from .state import User
 
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
 
@@ -119,7 +120,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise InvalidToken(_('Token contained no recognizable user identification'))
 
         try:
-            user = self.user_model.objects.get(**{api_settings.USER_ID_FIELD: user_id})
+            user = User.objects.get(**{api_settings.USER_ID_FIELD: user_id})
         except self.user_model.DoesNotExist:
             raise AuthenticationFailed(_('User not found'), code='user_not_found')
 
