@@ -4,7 +4,7 @@ from rest_framework import HTTP_HEADER_ENCODING, authentication
 from django.utils import timezone
 from .exceptions import AuthenticationFailed, InvalidToken, TokenError
 from .settings import api_settings
-from django_global_request.middleware import get_request
+from django_middleware_global_request.middleware import get_request
 
 from django.core.cache import cache
 
